@@ -2,8 +2,11 @@ import Wrapper from "../assets/wrappers/SearchContainer";
 import { useAppContext } from "../context/appContext";
 import FormRow from "./FormRow";
 import FormRowSelect from "./FormRowSelect";
+import { useMemo, useState } from "react";
 
 const SearchContainer = () => {
+  const [localSearch, setLocalSearch] = useState("");
+
   const {
     isLoading,
     search,
@@ -24,9 +27,24 @@ const SearchContainer = () => {
 
   const handleSearch = (e) => {
     //還在fetch 當前 search 時 return 不進行其他動作
-    if (isLoading) return;
+    // if (isLoading) return;
     handleChangeSearchValue({ name: e.target.name, value: e.target.value });
   };
+
+  const debounce = () => {
+    let timeoutID;
+    return (e) => {
+      setLocalSearch(e.target.value);
+      clearTimeout(timeoutID);
+      timeoutID = setTimeout(() => {
+        handleChangeSearchValue({ name: e.target.name, value: e.target.value });
+      }, 1000);
+    };
+  };
+
+  //useMemo 可以讓callback fn 不會因為set state而造成re-render
+  const optimizedDebounce = useMemo(() => debounce(), []);
+
   return (
     <Wrapper>
       <form className="form">
@@ -35,8 +53,8 @@ const SearchContainer = () => {
           <FormRow
             type="text"
             name="search"
-            value={search}
-            onChange={handleSearch}
+            value={localSearch}
+            onChange={optimizedDebounce}
           />
           <FormRowSelect
             labelText="job status"

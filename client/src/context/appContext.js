@@ -206,7 +206,7 @@ const AppProvider = ({ children }) => {
     //因為這些都有default value 直接設成default url
     let url = `/jobs?page=${page}&status=${searchStatus}&jobType=${searchType}&sort=${sort}`;
 
-    if (search) url += `search=${search}`;
+    if (search) url += `&search=${search}`;
 
     dispatch({ type: GET_JOBS_BEGIN });
     try {
